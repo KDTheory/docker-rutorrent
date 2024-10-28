@@ -22,10 +22,11 @@ RUN apk --update --no-cache add \
   php82-sockets php82-xml php82-zip rtorrent s6 sox su-exec unzip
 
 RUN RUTORRENT_VER=$(curl -s https://api.github.com/repos/Novik/ruTorrent/releases | \
-  jq -r '[.[] | select(.prerelease == false)][0].tag_name' | sed 's/v//') && \
-  echo "Dernière version stable de ruTorrent : ${RUTORRENT_VER}" && \
-  curl -L "https://github.com/Novik/ruTorrent/archive/v${RUTORRENT_VER}.tar.gz" | tar xz && \
-  mv "ruTorrent-${RUTORRENT_VER}" /rutorrent/app
+  jq -r '[.[] | select(.prerelease == false)][0].tag_name' | sed 's/v//')
+RUN echo "Dernière version stable de ruTorrent : ${RUTORRENT_VER}"
+RUN curl -L "https://github.com/Novik/ruTorrent/archive/v${RUTORRENT_VER}.tar.gz" | tar xz
+RUN mv "ruTorrent-${RUTORRENT_VER}" /rutorrent/app
+
 
 RUN git clone https://github.com/Micdu70/geoip2-rutorrent.git /rutorrent/app/plugins/geoip2 && \
   git clone https://github.com/Micdu70/rutorrent-ratiocolor.git /rutorrent/app/plugins/ratiocolor
