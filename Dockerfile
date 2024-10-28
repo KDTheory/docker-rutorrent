@@ -31,6 +31,9 @@ RUN mkdir -p /rutorrent/app \
 RUN git clone https://github.com/Micdu70/geoip2-rutorrent.git /rutorrent/app/plugins/geoip2 && \
   git clone https://github.com/Micdu70/rutorrent-ratiocolor.git /rutorrent/app/plugins/ratiocolor
 
+RUN mkdir -p /run/rtorrent /run/nginx /run/php
+
+RUN apk del --purge git
 
 COPY rootfs /
 RUN chmod 775 /usr/local/bin/*
