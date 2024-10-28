@@ -14,61 +14,22 @@ ENV UID=991 \
   HTTP_AUTH=false
 
 RUN apk --update --no-cache add \
-  7zip \
-  bash \
-  curl \
-  curl-dev \
-  ffmpeg \
-  ffmpeg-dev \
-  findutils \
-  git \
-  jq \
-  libmediainfo \
-  libmediainfo-dev \
-  libzen \
-  libzen-dev \
-  mediainfo \
-  mktorrent \
-  nginx \
-  openssl \
-  php82 \
-  php82-bcmath \
-  php82-ctype \
-  php82-curl \
-  php82-dom \
-  php82-fpm \
-  php82-mbstring \
-  php82-opcache \
-  php82-openssl \
-  php82-pecl-apcu \
-  php82-phar \
-  php82-session \
-  php82-sockets \
-  php82-xml \
-  php82-zip \
-  rtorrent \
-  s6 \
-  sox \
-  su-exec \
-  unzip \
-  unrar
+  7zip bash curl curl-dev ffmpeg ffmpeg-dev findutils git jq \
+  libmediainfo libmediainfo-dev libzen libzen-dev mediainfo \
+  mktorrent nginx openssl php82 php82-bcmath php82-ctype \
+  php82-curl php82-dom php82-fpm php82-mbstring php82-opcache \
+  php82-openssl php82-pecl-apcu php82-phar php82-session \
+  php82-sockets php82-xml php82-zip rtorrent s6 sox su-exec unzip
 
-# Installation de ruTorrent
 RUN RUTORRENT_VER=$(curl -s https://api.github.com/repos/Novik/ruTorrent/releases | \
   jq -r '[.[] | select(.prerelease == false)][0].tag_name' | sed 's/v//') && \
   echo "Dernière version stable de ruTorrent : ${RUTORRENT_VER}" && \
   curl -L "https://github.com/Novik/ruTorrent/archive/v${RUTORRENT_VER}.tar.gz" | tar xz && \
-  mv "ruTorrent-${RUTORRENT_VER}" /rutorrent/app && \
-  git clone https://github.com/Micdu70/geoip2-rutorrent.git /rutorrent/app/plugins/geoip2 && \
-  git clone https://github.com/Micdu70/rutorrent-ratiocolor.git /rutorrent/app/plugins/ratiocolor && \
-  rm -rf /rutorrent/app/plugins/geoip && \
-  rm -rf /rutorrent/app/plugins/_cloudflare && \
-  rm -rf /rutorrent/app/plugins/geoip2/.git && \
-  rm -rf /rutorrent/app/plugins/ratiocolor/.git && \
-  rm -rf /rutorrent/app/.git
+  mv "ruTorrent-${RUTORRENT_VER}" /rutorrent/app
 
-# Socket folder
-RUN mkdir -p /run/rtorrent /run/nginx /run/php
+RUN git clone https://github.com/Micdu70/geoip2-rutorrent.git /rutorrent/app/plugins/geoip2 && \
+  git clone https://github.com/Micdu70/rutorrent-ratiocolor.git /rutorrent/app/plugins/ratiocolor
+
 
 COPY rootfs /
 RUN chmod 775 /usr/local/bin/*
