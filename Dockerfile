@@ -44,6 +44,7 @@ RUN wget https://curl.se/download/curl-7.88.1.tar.gz -O /tmp/curl.tar.gz \
 # Build dumptorrent
 RUN git clone https://github.com/TheGoblinHero/dumptorrent.git /tmp/dumptorrent \
   && cd /tmp/dumptorrent \
+  && sed -i '1i#include <sys/time.h>' scrapec.c \
   && mkdir build \
   && cd build \
   && cmake .. \
