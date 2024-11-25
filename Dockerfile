@@ -26,7 +26,7 @@ RUN cd /tmp \
 # Télécharger et compiler c-ares
 RUN git clone https://github.com/c-ares/c-ares.git /tmp/c-ares \
   && cd /tmp/c-ares \
-  && ./buildconf \
+  && autoreconf -fi \
   && ./configure --prefix=/usr/local/cares \
   && make \
   && make install
@@ -35,6 +35,7 @@ RUN git clone https://github.com/c-ares/c-ares.git /tmp/c-ares \
 RUN wget https://curl.se/download/curl-7.88.1.tar.gz -O /tmp/curl.tar.gz \
   && tar xzf /tmp/curl.tar.gz -C /tmp \
   && cd /tmp/curl-7.88.1 \
+  && autoreconf -fi \
   && ./configure --enable-ares=/usr/local/cares --prefix=/usr/local/curl \
   && make V=1 \
   && make install
