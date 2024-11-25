@@ -10,6 +10,7 @@ RUN apk --update --no-cache add \
     cmake \
     cppunit-dev \
     curl-dev \
+    openssl-dev \
     libtool \
     linux-headers \
     zlib-dev \
@@ -36,7 +37,7 @@ RUN wget https://curl.se/download/curl-7.88.1.tar.gz -O /tmp/curl.tar.gz \
   && tar xzf /tmp/curl.tar.gz -C /tmp \
   && cd /tmp/curl-7.88.1 \
   && autoreconf -fi \
-  && ./configure --enable-ares=/usr/local/cares --prefix=/usr/local/curl \
+  && ./configure --enable-ares=/usr/local/cares --prefix=/usr/local/curl --with-openssl \
   && make V=1 \
   && make install
 
