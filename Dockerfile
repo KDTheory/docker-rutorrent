@@ -68,10 +68,46 @@ COPY --from=builder /usr/local/curl/bin/curl /usr/bin/
 COPY --from=builder /usr/local/curl/lib/libcurl.so* /usr/lib/
 
 # Installer uniquement les dépendances nécessaires au runtime
-RUN apk --update --no-cache add bash curl ffmpeg mediainfo rtorrent s6 sox su-exec unzip php82 php82-fpm nginx
+RUN apk --update --no-cache add \
+  7zip \
+  bash \
+  curl \
+  curl-dev \
+  ffmpeg \
+  ffmpeg-dev \
+  findutils \
+  git \
+  libmediainfo \
+  libmediainfo-dev \
+  libzen \
+  libzen-dev \
+  mediainfo \
+  mktorrent \
+  nginx \
+  openssl \
+  php82 \
+  php82-bcmath \
+  php82-ctype \
+  php82-curl \
+  php82-dom \
+  php82-fpm \
+  php82-mbstring \
+  php82-opcache \
+  php82-openssl \
+  php82-pecl-apcu \
+  php82-phar \
+  php82-session \
+  php82-sockets \
+  php82-xml \
+  php82-zip \
+  rtorrent \
+  s6 \
+  sox \
+  su-exec \
+  unzip \
 
-# Installer ruTorrent
-ARG RUTORRENT_VERSION=4.3.9
+  # Installer ruTorrent
+  ARG RUTORRENT_VERSION=4.3.9
 RUN mkdir -p /rutorrent/app \
   && wget https://github.com/Novik/ruTorrent/archive/v${RUTORRENT_VERSION}.tar.gz -O rutorrent.tar.gz \
   && tar xzf rutorrent.tar.gz --strip-components=1 -C /rutorrent/app \
