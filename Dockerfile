@@ -44,7 +44,7 @@ RUN apk --update --no-cache add \
   mktorrent nginx openssl php82 php82-bcmath php82-ctype \
   php82-curl php82-dom php82-fpm php82-mbstring php82-opcache \
   php82-openssl php82-pecl-apcu php82-phar php82-session \
-  php82-sockets php82-xml php82-zip dumptorrent python3 rtorrent s6 sox su-exec unzip
+  php82-sockets php82-xml php82-zip python3 rtorrent s6 sox su-exec unzip
 
 # Install ruTorrent
 ARG RUTORRENT_VERSION=5.1.0
