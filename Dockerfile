@@ -102,10 +102,11 @@ RUN apk --update --no-cache add \
   s6 \
   sox \
   su-exec \
-  unzip \
+  unzip
 
-  # Installer ruTorrent
-  ARG RUTORRENT_VERSION=4.3.9
+# Installer ruTorrent
+ARG RUTORRENT_VERSION=4.3.9
+
 RUN mkdir -p /rutorrent/app \
   && wget https://github.com/Novik/ruTorrent/archive/v${RUTORRENT_VERSION}.tar.gz -O rutorrent.tar.gz \
   && tar xzf rutorrent.tar.gz --strip-components=1 -C /rutorrent/app \
