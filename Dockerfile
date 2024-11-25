@@ -6,58 +6,55 @@ ARG CURL_VER=7.88.1
 
 # Installer les dépendances nécessaires pour la compilation
 RUN apk --update --no-cache add \
-    autoconf \
-    automake \
-    binutils \
-    build-base \
-    cmake \
-    cppunit-dev \
-    curl-dev \
-    openssl-dev \
-    libtool \
-    linux-headers \
-    zlib-dev \
-    git
+  autoconf \
+  automake \
+  binutils \
+  build-base \
+  cmake \
+  cppunit-dev \
+  curl-dev \
+  openssl-dev \
+  libtool \
+  linux-headers \
+  zlib-dev \
+  git
 
-# Étape 1.1 : Installer unrar
-RUN cd /tmp \
+# Étape 1.1 : Télécharger et compiler unrar avec cache
+RUN --mount=type=cache,target=/tmp/cache/unrar cd /tmp/cache/unrar \
   && wget https://www.rarlab.com/rar/unrarsrc-${UNRAR_VER}.tar.gz -O unrar.tar.gz \
   && tar -xzf unrar.tar.gz \
   && cd unrar \
   && make -f makefile \
-  && install -Dm 755 unrar /usr/bin/unrar \
-  && rm -rf /tmp/*
+  && install -Dm 755 unrar /usr/bin/unrar
 
-# Étape 1.2 : Télécharger et compiler c-ares
-RUN git clone --depth=1 https://github.com/c-ares/c-ares.git /tmp/c-ares \
-  && cd /tmp/c-ares \
+# Étape 1.2 : Télécharger et compiler c-ares avec cache
+RUN --mount=type=cache,target=/tmp/cache/c-ares git clone --depth=1 https://github.com/c-ares/c-ares.git /tmp/cache/c-ares \
+  && cd /tmp/cache/c-ares \
   && autoreconf -fi \
   && ./configure --prefix=/usr/local/cares \
   && make -j$(nproc) \
-  && make install \
-  && rm -rf /tmp/*
+  && make install
 
-# Étape 1.3 : Télécharger et compiler curl avec c-ares
-RUN wget https://curl.se/download/curl-${CURL_VER}.tar.gz -O /tmp/curl.tar.gz \
-  && tar xzf /tmp/curl.tar.gz -C /tmp \
-  && cd /tmp/curl-${CURL_VER} \
+# Étape 1.3 : Télécharger et compiler curl avec cache
+RUN --mount=type=cache,target=/tmp/cache/curl wget https://curl.se/download/curl-${CURL_VER}.tar.gz -O /tmp/cache/curl.tar.gz \
+  && tar xzf /tmp/cache/curl.tar.gz -C /tmp/cache/ \
+  && cd /tmp/cache/curl-${CURL_VER} \
   && autoreconf -fi \
   && ./configure --enable-ares=/usr/local/cares --prefix=/usr/local/curl --with-openssl \
   && make -j$(nproc) V=1 \
-  && make install \
-  && rm -rf /tmp/*
+  && make install
 
-# Étape 1.4 : Build dumptorrent
-RUN git clone --depth=1 https://github.com/TheGoblinHero/dumptorrent.git /tmp/dumptorrent \
-  && cd /tmp/dumptorrent \
-  && sed -i '1i#include <sys/time.h>' scrapec.c \ 
+# Étape 1.4 : Build dumptorrent avec cache
+RUN --mount=type=cache,target=/tmp/cache/dumptorrent git clone --depth=1 https://github.com/TheGoblinHero/dumptorrent.git /tmp/cache/dumptorrent \
+  && cd /tmp/cache/dumptorrent \
+  && sed -i '1i#include <sys/time.h>' scrapec.c \
   && mkdir build \
   && cd build \
   && cmake .. \
   && make -j$(nproc) \
   && install -Dm 755 dumptorrent /usr/bin/dumptorrent
 
-# Étape 2 : Image finale (runtime)
+# Étape finale : Image runtime minimale
 FROM alpine:3.20
 
 LABEL description="rutorrent basé sur Alpine Linux" maintainer="KDTheory <kdarmondev@gmail.com>"
@@ -71,7 +68,7 @@ COPY --from=builder /usr/local/curl/bin/curl /usr/bin/
 COPY --from=builder /usr/local/curl/lib/libcurl.so* /usr/lib/
 
 # Installer uniquement les dépendances nécessaires au runtime
-RUN apk --update --no-cache add bash curl ffmpeg mediainfo rtorrent s6 sox su-exec unzip php82 php82-fpm nginx git
+RUN apk --update --no-cache add bash curl ffmpeg mediainfo rtorrent s6 sox su-exec unzip php82 php82-fpm nginx
 
 # Installer ruTorrent
 ARG RUTORRENT_VERSION=4.3.9
@@ -82,7 +79,7 @@ RUN mkdir -p /rutorrent/app \
 
 # Ajouter des plugins supplémentaires à ruTorrent
 RUN git clone --depth=1 https://github.com/Micdu70/geoip2-rutorrent.git /rutorrent/app/plugins/geoip2 \
-    && git clone --depth=1 https://github.com/Micdu70/rutorrent-ratiocolor.git /rutorrent/app/plugins/ratiocolor
+  && git clone --depth=1 https://github.com/Micdu70/rutorrent-ratiocolor.git /rutorrent/app/plugins/ratiocolor
 
 # Préparer les répertoires nécessaires pour l'exécution
 RUN mkdir -p /run/rtorrent /run/nginx /run/php
