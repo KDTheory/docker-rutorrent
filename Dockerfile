@@ -32,11 +32,11 @@ RUN git clone https://github.com/c-ares/c-ares.git /tmp/c-ares \
   && make install
 
 # Télécharger et compiler curl avec c-ares
-RUN git clone https://github.com/curl/curl.git /tmp/curl \
-  && cd /tmp/curl \
-  && ./buildconf \
+RUN wget https://curl.se/download/curl-7.88.1.tar.gz -O /tmp/curl.tar.gz \
+  && tar xzf /tmp/curl.tar.gz -C /tmp \
+  && cd /tmp/curl-7.88.1 \
   && ./configure --enable-ares=/usr/local/cares --prefix=/usr/local/curl \
-  && make \
+  && make V=1 \
   && make install
 
 # Build dumptorrent
