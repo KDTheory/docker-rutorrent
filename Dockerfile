@@ -22,7 +22,7 @@ RUN apk --update --no-cache add \
   php82-sockets php82-xml php82-zip rtorrent s6 sox su-exec unzip
 
 # Install ruTorrent
-ARG RUTORRENT_VERSION=4.3.9
+ARG RUTORRENT_VERSION=5.1
 RUN mkdir -p /rutorrent/app \
   && wget -q https://github.com/Novik/ruTorrent/archive/v${RUTORRENT_VERSION}.tar.gz \
   && tar xzf v${RUTORRENT_VERSION}.tar.gz --strip-components=1 -C /rutorrent/app \
