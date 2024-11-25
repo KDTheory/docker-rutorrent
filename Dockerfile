@@ -19,40 +19,51 @@ RUN apk --update --no-cache add \
   zlib-dev \
   git
 
-# Étape 1.1 : Télécharger et compiler unrar avec cache
-RUN --mount=type=cache,target=/tmp/cache/unrar cd /tmp/cache/unrar \
-  && wget https://www.rarlab.com/rar/unrarsrc-${UNRAR_VER}.tar.gz -O unrar.tar.gz \
-  && tar -xzf unrar.tar.gz \
-  && cd unrar \
+# Étape 1.1 : Télécharger et compiler unrar avec vérification
+RUN mkdir -p /tmp/cache/unrar \
+  && if [ ! -f /tmp/cache/unrar/unrar-${UNRAR_VER}.built ]; then \
+  wget https://www.rarlab.com/rar/unrarsrc-${UNRAR_VER}.tar.gz -O /tmp/cache/unrar.tar.gz \
+  && tar -xzf /tmp/cache/unrar.tar.gz -C /tmp/cache/unrar \
+  && cd /tmp/cache/unrar \
   && make -f makefile \
-  && install -Dm 755 unrar /usr/bin/unrar
+  && install -Dm 755 unrar /usr/bin/unrar \
+  && touch /tmp/cache/unrar/unrar-${UNRAR_VER}.built; \
+  fi
 
-# Étape 1.2 : Télécharger et compiler c-ares avec cache
-RUN --mount=type=cache,target=/tmp/cache/c-ares git clone --depth=1 https://github.com/c-ares/c-ares.git /tmp/cache/c-ares \
-  && cd /tmp/cache/c-ares \
+# Étape 1.2 : Télécharger et compiler c-ares avec vérification
+RUN mkdir -p /tmp/cache/c-ares \
+  && if [ ! -d /tmp/cache/c-ares-${C_ARES_COMMIT} ]; then \
+  git clone --depth=1 https://github.com/c-ares/c-ares.git /tmp/cache/c-ares-${C_ARES_COMMIT} \
+  && cd /tmp/cache/c-ares-${C_ARES_COMMIT} \
   && autoreconf -fi \
   && ./configure --prefix=/usr/local/cares \
   && make -j$(nproc) \
-  && make install
+  && make install; \
+  fi
 
-# Étape 1.3 : Télécharger et compiler curl avec cache
-RUN --mount=type=cache,target=/tmp/cache/curl wget https://curl.se/download/curl-${CURL_VER}.tar.gz -O /tmp/cache/curl.tar.gz \
-  && tar xzf /tmp/cache/curl.tar.gz -C /tmp/cache/ \
-  && cd /tmp/cache/curl-${CURL_VER} \
+# Étape 1.3 : Télécharger et compiler curl avec vérification
+RUN mkdir -p /tmp/cache/curl \
+  && if [ ! -f /usr/local/curl/bin/curl ]; then \
+  wget https://curl.se/download/curl-${CURL_VER}.tar.gz -O /tmp/cache/curl.tar.gz \
+  && tar xzf /tmp/cache/curl.tar.gz --strip-components=1 -C /tmp/cache/curl/ \
+  && cd /tmp/cache/curl/ \
   && autoreconf -fi \
   && ./configure --enable-ares=/usr/local/cares --prefix=/usr/local/curl --with-openssl \
   && make -j$(nproc) V=1 \
-  && make install
+  && make install; \
+  fi
 
-# Étape 1.4 : Build dumptorrent avec cache
-RUN --mount=type=cache,target=/tmp/cache/dumptorrent git clone --depth=1 https://github.com/TheGoblinHero/dumptorrent.git /tmp/cache/dumptorrent \
-  && cd /tmp/cache/dumptorrent \
+# Étape 1.4 : Build dumptorrent avec vérification
+RUN mkdir -p /tmp/cache/dumptorrent \
+  && if [ ! -d /usr/bin/dumptorrent ]; then \
+  git clone --depth=1 https://github.com/TheGoblinHero/dumptorrent.git /tmp/cache/dumptorrent/ \
+  && cd /tmp/cache/dumptorrent/ \
   && sed -i '1i#include <sys/time.h>' scrapec.c \
-  && mkdir build \
-  && cd build \
+  && mkdir build && cd build/ \
   && cmake .. \
   && make -j$(nproc) \
-  && install -Dm 755 dumptorrent /usr/bin/dumptorrent
+  && install -Dm 755 dumptorrent /usr/bin/dumptorrent; \
+  fi
 
 # Étape finale : Image runtime minimale
 FROM alpine:3.20
