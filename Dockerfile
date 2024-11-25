@@ -1,3 +1,26 @@
+FROM alpine:3.20 AS builder
+
+ARG UNRAR_VER=7.0.9
+
+RUN apk --update --no-cache add \
+    autoconf \
+    automake \
+    binutils \
+    build-base \
+    cmake \
+    cppunit-dev \
+    curl-dev \
+    libtool \
+    linux-headers \
+    zlib-dev \
+  # Install unrar from source
+  && cd /tmp \
+  && wget https://www.rarlab.com/rar/unrarsrc-${UNRAR_VER}.tar.gz -O /tmp/unrar.tar.gz \
+  && tar -xzf /tmp/unrar.tar.gz \
+  && cd unrar \
+  && make -f makefile \
+  && install -Dm 755 unrar /usr/bin/unrar
+  
 FROM alpine:3.20
 
 LABEL description="rutorrent based on alpinelinux" \
