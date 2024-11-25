@@ -13,13 +13,35 @@ RUN apk --update --no-cache add \
     libtool \
     linux-headers \
     zlib-dev \
+    git \
   # Install unrar from source
   && cd /tmp \
   && wget https://www.rarlab.com/rar/unrarsrc-${UNRAR_VER}.tar.gz -O /tmp/unrar.tar.gz \
   && tar -xzf /tmp/unrar.tar.gz \
   && cd unrar \
   && make -f makefile \
-  && install -Dm 755 unrar /usr/bin/unrar
+  && install -Dm 755 unrar /usr/bin/unrar \
+  # Télécharger et compiler c-ares
+  && git clone https://github.com/c-ares/c-ares.git /tmp/c-ares \
+  && cd /tmp/c-ares \
+  && ./buildconf \
+  && ./configure --prefix=/usr/local/cares \
+  && make \
+  && make install \
+  && git clone https://github.com/curl/curl.git /tmp/curl \
+  && cd /tmp/curl \
+  && ./buildconf \
+  && ./configure --enable-ares=/usr/local/cares --prefix=/usr/local/curl \
+  && make \
+  && make install \
+  # Build dumptorrent
+  && git clone https://github.com/TheGoblinHero/dumptorrent.git /tmp/dumptorrent \
+  && cd /tmp/dumptorrent \
+  && mkdir build \
+  && cd build \
+  && cmake .. \
+  && make \
+  && install -Dm 755 dumptorrent /usr/bin/dumptorrent
   
 FROM alpine:3.20
 
@@ -36,7 +58,10 @@ ENV UID=991 \
   CHECK_PERM_DATA=true \
   HTTP_AUTH=false
   
+COPY --from=builder /usr/local/curl/bin/curl /usr/bin/
+COPY --from=builder /usr/local/curl/lib/libcurl.so* /usr/lib/
 COPY --from=builder /usr/bin/unrar /usr/bin
+COPY --from=builder /usr/bin/dumptorrent /usr/bin
 
 RUN apk --update --no-cache add \
   7zip bash curl curl-dev ffmpeg ffmpeg-dev findutils git jq \
