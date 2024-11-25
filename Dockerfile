@@ -71,8 +71,7 @@ COPY --from=builder /usr/local/curl/bin/curl /usr/bin/
 COPY --from=builder /usr/local/curl/lib/libcurl.so* /usr/lib/
 
 # Installer uniquement les dépendances nécessaires au runtime
-RUN apk --update --no-cache add \
-    bash curl ffmpeg mediainfo rtorrent s6 sox su-exec unzip php82 php82-fpm nginx
+RUN apk --update --no-cache add bash curl ffmpeg mediainfo rtorrent s6 sox su-exec unzip php82 php82-fpm nginx git
 
 # Installer ruTorrent
 ARG RUTORRENT_VERSION=4.3.9
