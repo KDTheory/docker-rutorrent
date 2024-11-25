@@ -35,6 +35,8 @@ ENV UID=991 \
   DOWNLOAD_DIRECTORY=/data/downloads \
   CHECK_PERM_DATA=true \
   HTTP_AUTH=false
+  
+COPY --from=builder /usr/bin/unrar /usr/bin
 
 RUN apk --update --no-cache add \
   7zip bash curl curl-dev ffmpeg ffmpeg-dev findutils git jq \
