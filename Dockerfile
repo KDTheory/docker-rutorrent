@@ -130,5 +130,7 @@ RUN chmod +x /usr/local/bin/*
 VOLUME ["/data", "/config"]
 EXPOSE 8080
 
+CMD tail -f /tmp/rutorrent*.log /tmp/rtorrent*.log &
+
 ENTRYPOINT ["/usr/local/bin/startup"]
 CMD ["/bin/s6-svscan", "/etc/s6.d"]
