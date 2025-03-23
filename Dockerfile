@@ -1,8 +1,8 @@
 # Étape 1 : Builder (compilation des dépendances)
 FROM alpine:3.20 AS builder
 
-ARG UNRAR_VER=7.0.9
-ARG CURL_VER=7.88.1
+ARG UNRAR_VER=7.1.5
+ARG CURL_VER=8.11.1
 
 # Installer les dépendances nécessaires pour la compilation
 RUN apk --update --no-cache add \
@@ -105,7 +105,7 @@ RUN apk --update --no-cache add \
   unzip
 
 # Installer ruTorrent
-ARG RUTORRENT_VERSION=4.3.9
+ARG RUTORRENT_VERSION=5.1.6
 
 RUN mkdir -p /rutorrent/app \
   && wget https://github.com/Novik/ruTorrent/archive/v${RUTORRENT_VERSION}.tar.gz -O rutorrent.tar.gz \
