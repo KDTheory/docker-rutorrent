@@ -105,7 +105,7 @@ RUN apk --update --no-cache add \
   unzip
 
 # Installer ruTorrent
-ARG RUTORRENT_VERSION=5.1.6
+ARG RUTORRENT_VERSION=4.3.10
 
 RUN mkdir -p /rutorrent/app \
   && wget https://github.com/Novik/ruTorrent/archive/v${RUTORRENT_VERSION}.tar.gz -O rutorrent.tar.gz \
